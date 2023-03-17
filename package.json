@@ -1,0 +1,23 @@
+{
+  "name": "achieve-promise",
+  "version": "1.0.0",
+  "description": "手写promise",
+  "main": "index.js",
+  "scripts": {
+    "test": "promises-aplus-tests MyPromise"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/borealRoc/achieve-promise.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/borealRoc/achieve-promise/issues"
+  },
+  "homepage": "https://github.com/borealRoc/achieve-promise#readme",
+  "devDependencies": {
+    "promises-aplus-tests": "^2.1.2"
+  }
+}

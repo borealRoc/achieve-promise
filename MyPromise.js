@@ -280,4 +280,13 @@ function resolvePromise(promise2, x, resolve, reject) {
   }
 }
 
+MyPromise.deferred = function () {
+  let result = {};
+  result.promise = new MyPromise((resolve, reject) => {
+    result.resolve = resolve;
+    result.reject = reject;
+  });
+  return result;
+};
 
+module.exports = MyPromise;
