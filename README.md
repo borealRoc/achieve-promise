@@ -4,29 +4,29 @@
 
 1. 它是一个类，并有一个函数参数：`class _promise {constructor(fn) {}}`
 2. 在 new 一个 promise 实例时，会立即执行该函数：`fn(resolve, reject)`
-3. 在执行时把该函数的两个回调函数参数赋值为我们实现的方法，并注意 this 的绑定：`fn(this.resolve.bind(this), this.reject.bind(this))`
-4. Promise 有三种状态：`pendding`, `fulFilled`, `rejected` 以及两个重要属性：`PromiseState` && `PromiseResult`
-5. 当最后执行 `resolve(value)` 时：`PromiseState === 'fulFilled' && PromiseResult === value`
+3. 在执行时把该函数的两个回调函数参数赋值为自己实现的方法，并注意 this 的绑定：`fn(this.resolve.bind(this), this.reject.bind(this))`
+4. Promise 有三种状态：`pendding`, `fulfilled`, `rejected` 以及两个重要属性：`PromiseState` && `PromiseResult`
+5. 当最后执行 `resolve(value)` 时：`PromiseState === 'fulfilled' && PromiseResult === value`
 6. 当最后执行 `reject(reason)` 时：`PromiseState === 'rejected' && PromiseResult === reason`
 7. 若执行 fn 时报错：`PromiseState === 'rejected' && PromiseResult === error`
-8. promise 的最终状态只能是 fulFilled || rejected 的一种
+8. promise 的最终状态只能是 fulfilled || rejected 的一种
 
 ## 二、实现 then
 
-1. then 的基础语法：`then(onFulfilled, onRejected)`
+### 1. then 的基础语法：`then(onFulfilled, onRejected)`
 
-- 如果 promise 的最终状态只能是 fulFilled，则把 PromiseResult 传给 then 方法的第一个回调函数并执行：`onFulfilled(this.PromiseResult)`
-- 如果 promise 的最终状态只能是 rejected PromiseResult 传给 then 方法的第二个回调函数并执行：`onRejected(this.PromiseResult)`
+- 如果 promise 的最终状态是 fulfilled，则把 PromiseResult 传给 then 方法的第一个回调函数并执行：`onFulfilled(this.PromiseResult)`
+- 如果 promise 的最终状态是 rejected, 则把 PromiseResult 传给 then 方法的第二个回调函数并执行：`onRejected(this.PromiseResult)`
 
-2. 实现 then 的异步调用
+### 2. 实现 then 的异步调用
 
 - 确保 then 在整体代码中是异步的，给 onFulfilled 和 onRejected 包裹 setTimeout: `setTimeout(() => onFulfilled(this.PromiseResult)) && setTimeout(() => onRejected(this.PromiseResult))`
-- 如果实例的状态是异步的，要确保 then 在异步的 resolve || reject 之后执行
-  - 首先，在执行 then 方法时，先将 then 回调函数进行保存：`this.onFulFilledCbs.push(onFulfilled) && this.onRejectedCbs.push(onRejected)`
-  - 在实例方法 `resolve(value) && reject(reason)` 的最后，再从回调数组取出所有函数来执行：`this.onFulFilledCbs.forEach(cb=> cb(value)) && this.onRejectedCbs.forEach(cb=> cb(reason))`
-- 在异步的 resolve || reject 内部，确保 then 要在最后执行，需要在上述保存 then 回调函数时，给回调函数包裹 setTimeout：`this.onFulFilledCbs.push(() => setTimeout(() => onFulfilled(this.PromiseResult))) && this.onRejectedCbs.push(() => setTimeout(() => onRejected(this.PromiseResult)))`
+- 如果 promise 实例的状态是异步的，要确保 then 在异步的 resolve || reject 之后执行
+  - 首先，在执行 then 方法时，先将 then 回调函数进行保存：`this.onFulfilledCbs.push(onFulfilled) && this.onRejectedCbs.push(onRejected)`
+  - 在实例方法 `resolve(value) && reject(reason)` 的最后，再从回调数组取出所有函数来执行：`this.onFulfilledCbs.forEach(cb=> cb(value)) && this.onRejectedCbs.forEach(cb=> cb(reason))`
+- 在异步的 resolve || reject 内部，确保 then 要在最后执行，需要在上述保存 then 回调函数时，给回调函数包裹 setTimeout：`this.onFulfilledCbs.push(() => setTimeout(() => onFulfilled(this.PromiseResult))) && this.onRejectedCbs.push(() => setTimeout(() => onRejected(this.PromiseResult)))`
 
-3. 实现 then 的链式调用 => then 方法返回一个新的 promise
+### 3. 实现 then 的链式调用 => then 方法返回一个新的 promise
 
 ```javascript
 then(onFulfilled, onRejected) {
@@ -100,7 +100,7 @@ then(onFulfilled, onRejected) {
 
 - 直接返回以 value 为拒因的拒绝态：`rej(value)`
 
-3. `_promise.race(promises)` => `return new _Promise((res, rej) => {})`
+3. `_Promise.race(promises)` => `return new _Promise((res, rej) => {})`
 
 - 如果 promises 不是数组，以 TypeError 为拒因返回拒绝态：`rej(new TypeError('Argument is not iterable'))`
 - 如果 promises 是数组
@@ -114,12 +114,12 @@ then(onFulfilled, onRejected) {
   });
   ```
 
-4. `_promise.all(promises)` => `return new _Promise((res, rej) => {})`
+4. `_Promise.all(promises)` => `return new _Promise((res, rej) => {})`
 
 - 如果 promises 不是数组，以 TypeError 为拒因返回拒绝态：`rej(new TypeError('Argument is not iterable'))`
 - 如果 promises 是数组
 
-  - 如果是空数组，则返回结果为 [] 的 fulFilled 状态：`return res([])`
+  - 如果是空数组，则返回结果为 [] 的 fulfilled 状态：`return res([])`
   - 如果是非空数组，遍历该数组，对每一项进行 `_Promise.resolve` 解析
 
     - 先定义一个结果数组：`const result = []; let count = 0`

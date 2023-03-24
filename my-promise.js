@@ -1,6 +1,6 @@
 class _Promise {
   static PENDING = "pending";
-  static FULFILLED = "fulFilled";
+  static FULFILLED = "fulfilled";
   static REJECTED = "rejected";
 
   constructor(fn) {
